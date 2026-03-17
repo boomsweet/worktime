@@ -5,6 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Bird WorkTime PRO</title>
 
+<link rel="manifest" href="manifest.json">
+
 <style>
 body {
   font-family: sans-serif;
@@ -21,7 +23,6 @@ body {
 h1 {
   text-align: center;
   color: #38bdf8;
-  margin-bottom: 20px;
 }
 
 .card {
@@ -29,45 +30,35 @@ h1 {
   padding: 15px;
   border-radius: 15px;
   margin-bottom: 15px;
-  box-shadow: 0 5px 15px rgba(0,0,0,0.3);
 }
 
 label {
-  font-size: 14px;
   color: #94a3b8;
+  font-size: 14px;
 }
 
 input {
   width: 100%;
   padding: 12px;
-  margin-top: 5px;
-  margin-bottom: 12px;
+  margin: 6px 0 12px;
   border-radius: 10px;
   border: none;
-  font-size: 16px;
 }
 
 button {
   width: 100%;
   padding: 12px;
-  margin-top: 8px;
   border-radius: 12px;
   border: none;
   font-weight: bold;
-  font-size: 16px;
+  margin-top: 5px;
 }
 
-.save {
-  background: #38bdf8;
-}
-
-.export {
-  background: #22c55e;
-}
+.save { background: #38bdf8; }
+.export { background: #22c55e; }
 
 table {
   width: 100%;
-  margin-top: 10px;
   border-collapse: collapse;
 }
 
@@ -81,9 +72,8 @@ th, td {
 }
 
 .total {
-  font-size: 18px;
-  margin-top: 10px;
   text-align: center;
+  margin-bottom: 10px;
 }
 </style>
 </head>
@@ -104,7 +94,10 @@ th, td {
   <label>⏰ เวลาออกงาน</label>
   <input type="time" id="out">
 
-  <button class="save" onclick="save()">💾 บันทึกข้อมูล</button>
+  <label>📝 เหตุผล OT</label>
+  <input type="text" id="note" placeholder="เช่น วิ่งงานช่วงเย็น / ส่งออก / รับเข้า">
+
+  <button class="save" onclick="save()">💾 บันทึก</button>
   <button class="export" onclick="exportExcel()">📥 Export Excel</button>
 </div>
 
@@ -117,8 +110,9 @@ th, td {
         <th>วันที่</th>
         <th>เข้า</th>
         <th>ออก</th>
-        <th>ชั่วโมง</th>
+        <th>ชม.</th>
         <th>OT</th>
+        <th>เหตุผล</th>
         <th>จัดการ</th>
       </tr>
     </thead>
@@ -154,6 +148,7 @@ function render(){
       <td>${d.out}</td>
       <td>${c.hrs}</td>
       <td>${c.ot}</td>
+      <td>${d.note || "-"}</td>
       <td>
         <button onclick="edit(${i})">✏️</button>
         <button onclick="del(${i})">🗑️</button>
@@ -171,13 +166,14 @@ function save(){
   let date = document.getElementById("date").value;
   let inputIn = document.getElementById("in").value;
   let out = document.getElementById("out").value;
+  let note = document.getElementById("note").value;
 
   if(!date || !inputIn || !out){
     alert("กรอกข้อมูลให้ครบ");
     return;
   }
 
-  list.push({date, in:inputIn, out});
+  list.push({date, in:inputIn, out, note});
   render();
 }
 
@@ -191,15 +187,16 @@ function edit(i){
   document.getElementById("date").value = d.date;
   document.getElementById("in").value = d.in;
   document.getElementById("out").value = d.out;
+  document.getElementById("note").value = d.note;
   del(i);
 }
 
 function exportExcel(){
-  let csv = "Date,In,Out,Hours,OT\n";
+  let csv = "Date,In,Out,Hours,OT,Note\n";
 
   list.forEach(d=>{
     let c = calc(d.in, d.out);
-    csv += `${d.date},${d.in},${d.out},${c.hrs},${c.ot}\n`;
+    csv += `${d.date},${d.in},${d.out},${c.hrs},${c.ot},${d.note}\n`;
   });
 
   let blob = new Blob([csv], {type: "text/csv"});
