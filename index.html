@@ -6,6 +6,8 @@
 <title>Bird WorkTime PRO</title>
 
 <link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon.png">
+<meta name="theme-color" content="#38bdf8">
 
 <style>
 body {
@@ -20,9 +22,21 @@ body {
   margin: auto;
 }
 
+.logo {
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+.logo img {
+  width: 110px;
+  border-radius: 20px;
+  box-shadow: 0 0 20px #38bdf8;
+}
+
 h1 {
   text-align: center;
   color: #38bdf8;
+  margin-bottom: 15px;
 }
 
 .card {
@@ -82,7 +96,12 @@ th, td {
 
 <div class="container">
 
-<h1>🕒 Bird WorkTime PRO</h1>
+<!-- 🔥 โลโก้ -->
+<div class="logo">
+  <img src="icon.png">
+</div>
+
+<h1>Bird WorkTime PRO</h1>
 
 <div class="card">
   <label>📅 วันที่</label>
@@ -95,7 +114,7 @@ th, td {
   <input type="time" id="out">
 
   <label>📝 เหตุผล OT</label>
-  <input type="text" id="note" placeholder="เช่น วิ่งงานช่วงเย็น / ส่งออก / รับเข้า">
+  <input type="text" id="note" placeholder="เช่น งานด่วน / ลูกค้า / แก้ระบบ">
 
   <button class="save" onclick="save()">💾 บันทึก</button>
   <button class="export" onclick="exportExcel()">📥 Export Excel</button>
@@ -207,6 +226,11 @@ function exportExcel(){
 }
 
 render();
+
+// 🔥 Service Worker
+if ("serviceWorker" in navigator) {
+  navigator.serviceWorker.register("sw.js");
+}
 </script>
 
 </body>
