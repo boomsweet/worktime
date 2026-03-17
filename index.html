@@ -8,31 +8,81 @@
 <style>
 body {
   font-family: sans-serif;
-  background: #0f172a;
+  background: linear-gradient(180deg,#0f172a,#020617);
   color: white;
   padding: 15px;
 }
+
+.container {
+  max-width: 500px;
+  margin: auto;
+}
+
 h1 {
   text-align: center;
   color: #38bdf8;
+  margin-bottom: 20px;
 }
-input, button {
+
+.card {
+  background: #1e293b;
+  padding: 15px;
+  border-radius: 15px;
+  margin-bottom: 15px;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+}
+
+label {
+  font-size: 14px;
+  color: #94a3b8;
+}
+
+input {
   width: 100%;
   padding: 12px;
-  margin: 6px 0;
+  margin-top: 5px;
+  margin-bottom: 12px;
   border-radius: 10px;
   border: none;
+  font-size: 16px;
 }
+
 button {
-  background: #38bdf8;
+  width: 100%;
+  padding: 12px;
+  margin-top: 8px;
+  border-radius: 12px;
+  border: none;
   font-weight: bold;
+  font-size: 16px;
 }
+
+.save {
+  background: #38bdf8;
+}
+
+.export {
+  background: #22c55e;
+}
+
 table {
   width: 100%;
   margin-top: 10px;
+  border-collapse: collapse;
 }
+
+th {
+  background: #334155;
+}
+
 th, td {
   padding: 8px;
+  text-align: center;
+}
+
+.total {
+  font-size: 18px;
+  margin-top: 10px;
   text-align: center;
 }
 </style>
@@ -40,30 +90,43 @@ th, td {
 
 <body>
 
+<div class="container">
+
 <h1>🕒 Bird WorkTime PRO</h1>
 
-<input type="date" id="date">
-<input type="time" id="in">
-<input type="time" id="out">
+<div class="card">
+  <label>📅 วันที่</label>
+  <input type="date" id="date">
 
-<button onclick="save()">💾 บันทึก</button>
-<button onclick="exportExcel()">📥 Export Excel</button>
+  <label>⏰ เวลาเข้างาน</label>
+  <input type="time" id="in">
 
-<h3>รวม OT: <span id="totalOT">0</span> ชม.</h3>
+  <label>⏰ เวลาออกงาน</label>
+  <input type="time" id="out">
 
-<table border="1">
-<thead>
-<tr>
-<th>วันที่</th>
-<th>เข้า</th>
-<th>ออก</th>
-<th>ชั่วโมง</th>
-<th>OT</th>
-<th>จัดการ</th>
-</tr>
-</thead>
-<tbody id="data"></tbody>
-</table>
+  <button class="save" onclick="save()">💾 บันทึกข้อมูล</button>
+  <button class="export" onclick="exportExcel()">📥 Export Excel</button>
+</div>
+
+<div class="card">
+  <div class="total">📊 รวม OT: <span id="totalOT">0</span> ชั่วโมง</div>
+
+  <table border="1">
+    <thead>
+      <tr>
+        <th>วันที่</th>
+        <th>เข้า</th>
+        <th>ออก</th>
+        <th>ชั่วโมง</th>
+        <th>OT</th>
+        <th>จัดการ</th>
+      </tr>
+    </thead>
+    <tbody id="data"></tbody>
+  </table>
+</div>
+
+</div>
 
 <script>
 let list = JSON.parse(localStorage.getItem("work")) || [];
@@ -110,7 +173,7 @@ function save(){
   let out = document.getElementById("out").value;
 
   if(!date || !inputIn || !out){
-    alert("กรอกให้ครบ");
+    alert("กรอกข้อมูลให้ครบ");
     return;
   }
 
