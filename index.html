@@ -1,150 +1,152 @@
 <!DOCTYPE html>
 <html lang="th">
 <head>
-  <meta charset="UTF-8">
-  <title>Bird WorkTime</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bird WorkTime PRO</title>
 
-  <style>
-    body {
-      font-family: sans-serif;
-      background: #0f172a;
-      color: #fff;
-      padding: 15px;
-    }
-    h1 {
-      text-align: center;
-      color: #38bdf8;
-    }
-    input, button {
-      width: 100%;
-      padding: 10px;
-      margin-top: 8px;
-      border-radius: 10px;
-      border: none;
-      font-size: 16px;
-    }
-    input {
-      background: #1e293b;
-      color: white;
-    }
-    button {
-      background: #38bdf8;
-      color: black;
-      font-weight: bold;
-    }
-    table {
-      width: 100%;
-      margin-top: 15px;
-      border-collapse: collapse;
-    }
-    th, td {
-      padding: 8px;
-      text-align: center;
-      border-bottom: 1px solid #334155;
-    }
-    th {
-      color: #38bdf8;
-    }
-  </style>
+<style>
+body {
+  font-family: sans-serif;
+  background: #0f172a;
+  color: white;
+  padding: 15px;
+}
+h1 {
+  text-align: center;
+  color: #38bdf8;
+}
+input, button {
+  width: 100%;
+  padding: 12px;
+  margin: 6px 0;
+  border-radius: 10px;
+  border: none;
+}
+button {
+  background: #38bdf8;
+  font-weight: bold;
+}
+table {
+  width: 100%;
+  margin-top: 10px;
+}
+th, td {
+  padding: 8px;
+  text-align: center;
+}
+</style>
 </head>
 
 <body>
 
-<h1>🕒 Bird WorkTime</h1>
+<h1>🕒 Bird WorkTime PRO</h1>
 
-<label>📅 วันที่</label>
 <input type="date" id="date">
-
-<label>⏰ เวลาเข้า</label>
 <input type="time" id="in">
-
-<label>⏰ เวลาออก</label>
 <input type="time" id="out">
 
-<button onclick="saveData()">💾 บันทึก</button>
+<button onclick="save()">💾 บันทึก</button>
+<button onclick="exportExcel()">📥 Export Excel</button>
 
-<table>
-  <thead>
-    <tr>
-      <th>วันที่</th>
-      <th>เข้า</th>
-      <th>ออก</th>
-      <th>ชั่วโมง</th>
-    </tr>
-  </thead>
-  <tbody id="dataTable"></tbody>
+<h3>รวม OT: <span id="totalOT">0</span> ชม.</h3>
+
+<table border="1">
+<thead>
+<tr>
+<th>วันที่</th>
+<th>เข้า</th>
+<th>ออก</th>
+<th>ชั่วโมง</th>
+<th>OT</th>
+<th>จัดการ</th>
+</tr>
+</thead>
+<tbody id="data"></tbody>
 </table>
 
-<!-- Firebase -->
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getFirestore, collection, addDoc, getDocs } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+<script>
+let list = JSON.parse(localStorage.getItem("work")) || [];
 
-const firebaseConfig = {
-  apiKey: "AIzaSyDtJpmBYs7uKExt5-LF4bDAKoJhcWC2wZk",
-  authDomain: "bird-worktime.firebaseapp.com",
-  projectId: "bird-worktime",
-  storageBucket: "bird-worktime.firebasestorage.app",
-  messagingSenderId: "1006621097399",
-  appId: "1:1006621097399:web:d7272dcd29bae5c2d27c32",
-};
+function calc(inTime, outTime){
+  let start = new Date("2000-01-01 " + inTime);
+  let end = new Date("2000-01-01 " + outTime);
+  let hrs = (end - start)/1000/60/60;
+  let ot = hrs > 9 ? hrs - 9 : 0;
+  return {hrs: hrs.toFixed(2), ot: ot.toFixed(2)};
+}
 
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
+function render(){
+  let html = "";
+  let totalOT = 0;
 
-async function saveData() {
-  const date = document.getElementById("date").value;
-  const timeIn = document.getElementById("in").value;
-  const timeOut = document.getElementById("out").value;
+  list.forEach((d,i)=>{
+    let c = calc(d.in, d.out);
+    totalOT += parseFloat(c.ot);
 
-  if (!date || !timeIn || !timeOut) {
-    alert("กรอกข้อมูลให้ครบ");
+    html += `
+    <tr>
+      <td>${d.date}</td>
+      <td>${d.in}</td>
+      <td>${d.out}</td>
+      <td>${c.hrs}</td>
+      <td>${c.ot}</td>
+      <td>
+        <button onclick="edit(${i})">✏️</button>
+        <button onclick="del(${i})">🗑️</button>
+      </td>
+    </tr>`;
+  });
+
+  document.getElementById("data").innerHTML = html;
+  document.getElementById("totalOT").innerText = totalOT.toFixed(2);
+
+  localStorage.setItem("work", JSON.stringify(list));
+}
+
+function save(){
+  let date = document.getElementById("date").value;
+  let inputIn = document.getElementById("in").value;
+  let out = document.getElementById("out").value;
+
+  if(!date || !inputIn || !out){
+    alert("กรอกให้ครบ");
     return;
   }
 
-  const hours = calculateHours(timeIn, timeOut);
+  list.push({date, in:inputIn, out});
+  render();
+}
 
-  await addDoc(collection(db, "worktime"), {
-    date,
-    timeIn,
-    timeOut,
-    hours
+function del(i){
+  list.splice(i,1);
+  render();
+}
+
+function edit(i){
+  let d = list[i];
+  document.getElementById("date").value = d.date;
+  document.getElementById("in").value = d.in;
+  document.getElementById("out").value = d.out;
+  del(i);
+}
+
+function exportExcel(){
+  let csv = "Date,In,Out,Hours,OT\n";
+
+  list.forEach(d=>{
+    let c = calc(d.in, d.out);
+    csv += `${d.date},${d.in},${d.out},${c.hrs},${c.ot}\n`;
   });
 
-  alert("บันทึกสำเร็จ");
-  loadData();
+  let blob = new Blob([csv], {type: "text/csv"});
+  let a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "worktime.csv";
+  a.click();
 }
 
-function calculateHours(start, end) {
-  const s = new Date(`2000-01-01 ${start}`);
-  const e = new Date(`2000-01-01 ${end}`);
-  return ((e - s) / 1000 / 60 / 60).toFixed(2);
-}
-
-async function loadData() {
-  const table = document.getElementById("dataTable");
-  table.innerHTML = "";
-
-  const querySnapshot = await getDocs(collection(db, "worktime"));
-
-  querySnapshot.forEach((doc) => {
-    const d = doc.data();
-
-    table.innerHTML += `
-      <tr>
-        <td>${d.date}</td>
-        <td>${d.timeIn}</td>
-        <td>${d.timeOut}</td>
-        <td>${d.hours}</td>
-      </tr>
-    `;
-  });
-}
-
-loadData();
-
-window.saveData = saveData;
+render();
 </script>
 
 </body>
