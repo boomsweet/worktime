@@ -5,112 +5,80 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Bird WorkTime PRO</title>
 
-<style>
-* { box-sizing: border-box; }
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#020617">
 
+<style>
 body {
-  margin: 0;
-  font-family: 'Segoe UI', sans-serif;
-  background: #020617;
-  color: #e2e8f0;
+  margin:0;
+  font-family:'Segoe UI',sans-serif;
+  background:#020617;
+  color:#e2e8f0;
 }
 
-/* HEADER */
 .header {
-  text-align: center;
-  padding: 20px 10px;
+  text-align:center;
+  padding:20px;
 }
 .header img {
-  width: 80px;
-  border-radius: 20px;
-  box-shadow: 0 0 25px #38bdf8;
-}
-.header h1 {
-  margin-top: 10px;
-  font-size: 20px;
-  color: #38bdf8;
+  width:80px;
+  border-radius:20px;
 }
 
-/* CARD */
 .card {
-  background: rgba(30,41,59,0.6);
-  backdrop-filter: blur(10px);
-  margin: 12px;
-  padding: 15px;
-  border-radius: 18px;
+  margin:12px;
+  padding:15px;
+  border-radius:18px;
+  background:#1e293b;
 }
 
-/* INPUT */
-label {
-  font-size: 13px;
-  color: #94a3b8;
-}
 input {
-  width: 100%;
-  padding: 12px;
-  margin: 6px 0 12px;
-  border-radius: 12px;
-  border: none;
-  background: #0f172a;
-  color: white;
+  width:100%;
+  padding:12px;
+  margin:6px 0;
+  border-radius:12px;
+  border:none;
+  background:#020617;
+  color:white;
 }
 
-/* BUTTON */
-.btn {
-  width: 100%;
-  padding: 12px;
-  border-radius: 14px;
-  border: none;
-  font-weight: bold;
-  margin-top: 6px;
-}
-.primary { background: #38bdf8; }
-.success { background: #22c55e; }
-
-/* TOTAL */
-.total {
-  text-align: center;
-  font-size: 18px;
-  margin-bottom: 10px;
+button {
+  width:100%;
+  padding:12px;
+  border:none;
+  border-radius:12px;
+  margin-top:8px;
+  font-weight:bold;
 }
 
-/* TABLE */
+.primary { background:#38bdf8; }
+.success { background:#22c55e; }
+
 table {
-  width: 100%;
-  border-collapse: collapse;
+  width:100%;
 }
-th {
-  background: #1e293b;
-}
-th, td {
-  padding: 8px;
-  font-size: 13px;
-  text-align: center;
-}
-
-/* BADGE */
-.badge {
-  padding: 4px 8px;
-  border-radius: 8px;
-  font-size: 12px;
-}
-.ot { background: #ef4444; }
-.normal { background: #22c55e; }
-
-/* ACTION */
-.action-btn {
-  padding: 5px 8px;
-  border-radius: 8px;
-  border: none;
-  margin: 2px;
-}
-.edit { background: #facc15; }
-.delete { background: #ef4444; }
-
-.empty {
+th,td {
+  padding:6px;
   text-align:center;
-  margin-top:10px;
-  color:#94a3b8;
+}
+
+.badge {
+  padding:4px 8px;
+  border-radius:8px;
+}
+.ot { background:#ef4444; }
+.normal { background:#22c55e; }
+
+.install-btn {
+  position:fixed;
+  bottom:80px;
+  left:50%;
+  transform:translateX(-50%);
+  padding:12px 20px;
+  border-radius:12px;
+  background:#22c55e;
+  color:white;
+  display:none;
 }
 </style>
 </head>
@@ -119,155 +87,119 @@ th, td {
 
 <div class="header">
   <img src="icon2.png">
-  <h1>Bird WorkTime PRO</h1>
+  <h2>Bird WorkTime PRO</h2>
 </div>
 
 <div class="card">
-  <label>📅 วันที่</label>
-  <input type="date" id="date">
+<input type="date" id="date">
+<input type="time" id="in">
+<input type="time" id="out">
+<input type="text" id="note" placeholder="เหตุผล OT">
 
-  <label>⏰ เข้า</label>
-  <input type="time" id="in">
-
-  <label>⏰ ออก</label>
-  <input type="time" id="out">
-
-  <label>📝 เหตุผล OT</label>
-  <input type="text" id="note">
-
-  <button class="btn primary" onclick="save()">💾 บันทึก</button>
-  <button class="btn success" onclick="exportExcel()">📥 Export</button>
+<button class="primary" onclick="save()">บันทึก</button>
+<button class="success" onclick="exportExcel()">Export</button>
 </div>
 
 <div class="card">
-  <div class="total">📊 OT รวม: <span id="totalOT">0</span> ชม.</div>
-
-  <table>
-    <thead>
-      <tr>
-        <th>วัน</th>
-        <th>เข้า</th>
-        <th>ออก</th>
-        <th>ชม.</th>
-        <th>OT</th>
-        <th>เหตุผล</th>
-        <th>⚙️</th>
-      </tr>
-    </thead>
-    <tbody id="data"></tbody>
-  </table>
-
-  <p id="empty" class="empty"></p>
+<table>
+<thead>
+<tr>
+<th>วัน</th><th>OT</th><th>เหตุผล</th>
+</tr>
+</thead>
+<tbody id="data"></tbody>
+</table>
 </div>
+
+<button id="installBtn" class="install-btn">📲 ติดตั้งแอป</button>
 
 <script>
 let list = JSON.parse(localStorage.getItem("work")) || [];
 
-function calc(inTime, outTime){
-  let start = new Date("2000-01-01 " + inTime);
-  let end = new Date("2000-01-01 " + outTime);
-  let hrs = (end - start)/1000/60/60;
-  let ot = hrs > 9 ? hrs - 9 : 0;
-  return {hrs: hrs.toFixed(2), ot: ot.toFixed(2)};
+function calc(i,o){
+ let s=new Date("2000 "+i);
+ let e=new Date("2000 "+o);
+ let h=(e-s)/3600000;
+ return {ot:h>9?(h-9):0};
 }
 
 function render(){
-  let html = "";
-  let totalOT = 0;
+ let html="";
+ let sorted=[...list].sort((a,b)=> new Date(b.date)-new Date(a.date));
 
-  if(list.length === 0){
-    document.getElementById("empty").innerText = "ยังไม่มีข้อมูล 😅";
-  } else {
-    document.getElementById("empty").innerText = "";
-  }
+ sorted.forEach(d=>{
+  let c=calc(d.in,d.out);
 
-  // 🔥 เรียงวันที่ใหม่ → เก่า
-  let sorted = [...list].sort((a,b)=>{
-    return new Date(b.date) - new Date(a.date);
-  });
+  let dateTH=new Date(d.date).toLocaleDateString("th-TH");
 
-  sorted.forEach((d,i)=>{
-    let c = calc(d.in, d.out);
-    totalOT += parseFloat(c.ot);
+  html+=`
+  <tr>
+   <td>${dateTH}</td>
+   <td><span class="badge ${c.ot>0?'ot':'normal'}">${c.ot.toFixed(2)}</span></td>
+   <td>${d.note||"-"}</td>
+  </tr>`;
+ });
 
-    // 🔥 แปลงเป็น พ.ศ.
-    let dateTH = new Date(d.date).toLocaleDateString("th-TH", {
-      year: "numeric",
-      month: "2-digit",
-      day: "2-digit"
-    });
-
-    html += `
-    <tr>
-      <td>${dateTH}</td>
-      <td>${d.in}</td>
-      <td>${d.out}</td>
-      <td><span class="badge normal">${c.hrs}</span></td>
-      <td><span class="badge ${c.ot>0?'ot':'normal'}">${c.ot}</span></td>
-      <td>${d.note || "-"}</td>
-      <td>
-        <button class="action-btn edit" onclick="edit(${i})">✏️</button>
-        <button class="action-btn delete" onclick="del(${i})">🗑️</button>
-      </td>
-    </tr>`;
-  });
-
-  document.getElementById("data").innerHTML = html;
-  document.getElementById("totalOT").innerText = totalOT.toFixed(2);
-  localStorage.setItem("work", JSON.stringify(list));
+ document.getElementById("data").innerHTML=html;
+ localStorage.setItem("work",JSON.stringify(list));
 }
 
 function save(){
-  let date = document.getElementById("date").value;
-  let inputIn = document.getElementById("in").value;
-  let out = document.getElementById("out").value;
-  let note = document.getElementById("note").value;
+ if(!date.value||!in.value||!out.value){ alert("กรอกให้ครบ"); return; }
 
-  if(!date || !inputIn || !out){
-    alert("กรอกข้อมูลให้ครบ");
-    return;
-  }
+ list.push({
+  date:date.value,
+  in:in.value,
+  out:out.value,
+  note:note.value
+ });
 
-  list.push({date, in:inputIn, out, note});
+ date.value="";
+ in.value="";
+ out.value="";
+ note.value="";
 
-  document.getElementById("date").value = "";
-  document.getElementById("in").value = "";
-  document.getElementById("out").value = "";
-  document.getElementById("note").value = "";
-
-  render();
-}
-
-function del(i){
-  list.splice(i,1);
-  render();
-}
-
-function edit(i){
-  let d = list[i];
-  document.getElementById("date").value = d.date;
-  document.getElementById("in").value = d.in;
-  document.getElementById("out").value = d.out;
-  document.getElementById("note").value = d.note;
-  del(i);
+ render();
 }
 
 function exportExcel(){
-  let csv = "Date,In,Out,Hours,OT,Note\n";
+ let csv="Date,OT,Note\n";
+ list.forEach(d=>{
+  let c=calc(d.in,d.out);
+  csv+=`${d.date},${c.ot.toFixed(2)},${d.note}\n`;
+ });
 
-  list.forEach(d=>{
-    let c = calc(d.in, d.out);
-    csv += `${d.date},${d.in},${d.out},${c.hrs},${c.ot},${d.note}\n`;
-  });
-
-  let blob = new Blob([csv], {type: "text/csv"});
-  let a = document.createElement("a");
-  a.href = URL.createObjectURL(blob);
-  a.download = "worktime.csv";
-  a.click();
+ let blob=new Blob([csv]);
+ let a=document.createElement("a");
+ a.href=URL.createObjectURL(blob);
+ a.download="worktime.csv";
+ a.click();
 }
 
 render();
+
+/* 🔥 ปุ่มติดตั้งแอป */
+let deferredPrompt;
+const btn=document.getElementById("installBtn");
+
+window.addEventListener("beforeinstallprompt",(e)=>{
+ e.preventDefault();
+ deferredPrompt=e;
+ btn.style.display="block";
+});
+
+btn.addEventListener("click",()=>{
+ deferredPrompt.prompt();
+ deferredPrompt.userChoice.then(()=>{
+  deferredPrompt=null;
+  btn.style.display="none";
+ });
+});
+
+/* service worker */
+if("serviceWorker" in navigator){
+ navigator.serviceWorker.register("sw.js");
+}
 </script>
 
 </body>
