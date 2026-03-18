@@ -10,31 +10,20 @@
 
 <style>
 * { box-sizing: border-box; }
-
 body {
   margin: 0;
   font-family: 'Segoe UI', sans-serif;
   background: #020617;
   color: #e2e8f0;
 }
-
-/* HEADER */
-.header {
-  text-align: center;
-  padding: 20px 10px;
-}
+.header { text-align: center; padding: 20px 10px; }
 .header img {
   width: 80px;
   border-radius: 20px;
   box-shadow: 0 0 25px #38bdf8;
 }
-.header h1 {
-  margin-top: 10px;
-  font-size: 20px;
-  color: #38bdf8;
-}
+.header h1 { margin-top: 10px; font-size: 20px; color: #38bdf8; }
 
-/* CARD */
 .card {
   background: rgba(30,41,59,0.6);
   backdrop-filter: blur(10px);
@@ -43,11 +32,8 @@ body {
   border-radius: 18px;
 }
 
-/* INPUT */
-label {
-  font-size: 13px;
-  color: #94a3b8;
-}
+label { font-size: 13px; color: #94a3b8; }
+
 input {
   width: 100%;
   padding: 12px;
@@ -58,7 +44,6 @@ input {
   color: white;
 }
 
-/* BUTTON */
 .btn {
   width: 100%;
   padding: 12px;
@@ -70,28 +55,23 @@ input {
 .primary { background: #38bdf8; }
 .success { background: #22c55e; }
 
-/* TOTAL */
 .total {
   text-align: center;
   font-size: 18px;
   margin-bottom: 10px;
 }
 
-/* TABLE */
 table {
   width: 100%;
   border-collapse: collapse;
 }
-th {
-  background: #1e293b;
-}
+th { background: #1e293b; }
 th, td {
   padding: 8px;
   font-size: 13px;
   text-align: center;
 }
 
-/* BADGE */
 .badge {
   padding: 4px 8px;
   border-radius: 8px;
@@ -100,7 +80,6 @@ th, td {
 .ot { background: #ef4444; }
 .normal { background: #22c55e; }
 
-/* ACTION */
 .action-btn {
   padding: 5px 8px;
   border-radius: 8px;
@@ -178,21 +157,15 @@ function render(){
   let html = "";
   let totalOT = 0;
 
-  if(list.length === 0){
-    document.getElementById("empty").innerText = "ยังไม่มีข้อมูล 😅";
-  } else {
-    document.getElementById("empty").innerText = "";
-  }
+  document.getElementById("empty").innerText =
+    list.length === 0 ? "ยังไม่มีข้อมูล 😅" : "";
 
-  let sorted = [...list].sort((a,b)=>{
-    return new Date(b.date) - new Date(a.date);
-  });
+  let sorted = [...list].sort((a,b)=> new Date(b.date) - new Date(a.date));
 
   sorted.forEach((d,i)=>{
     let c = calc(d.in, d.out);
     totalOT += parseFloat(c.ot);
 
-    // ✅ พ.ศ. แบบเดิมเป๊ะ
     let dateTH = new Date(d.date).toLocaleDateString("th-TH", {
       year: "numeric",
       month: "2-digit",
@@ -220,29 +193,37 @@ function render(){
 }
 
 function save(){
-  if(!date.value || !in.value || !out.value){
+  let date = document.getElementById("date").value;
+  let inputIn = document.getElementById("in").value;
+  let out = document.getElementById("out").value;
+  let note = document.getElementById("note").value;
+
+  if(!date || !inputIn || !out){
     alert("กรอกข้อมูลให้ครบ");
     return;
   }
 
-  list.push({date:date.value, in:in.value, out:out.value, note:note.value});
+  list.push({date, in:inputIn, out, note});
 
-  date.value="";
-  in.value="";
-  out.value="";
-  note.value="";
+  document.getElementById("date").value = "";
+  document.getElementById("in").value = "";
+  document.getElementById("out").value = "";
+  document.getElementById("note").value = "";
 
   render();
 }
 
-function del(i){ list.splice(i,1); render(); }
+function del(i){
+  list.splice(i,1);
+  render();
+}
 
 function edit(i){
   let d = list[i];
-  date.value=d.date;
-  in.value=d.in;
-  out.value=d.out;
-  note.value=d.note;
+  document.getElementById("date").value = d.date;
+  document.getElementById("in").value = d.in;
+  document.getElementById("out").value = d.out;
+  document.getElementById("note").value = d.note;
   del(i);
 }
 
@@ -262,23 +243,19 @@ function exportExcel(){
 
 render();
 
-/* 🔥 ติดตั้งแอปอัตโนมัติ */
+/* ติดตั้งแอป */
 let deferredPrompt;
-
-window.addEventListener("beforeinstallprompt", (e) => {
+window.addEventListener("beforeinstallprompt", (e)=>{
   e.preventDefault();
   deferredPrompt = e;
 
-  // 👉 เด้ง popup ทันที
   setTimeout(()=>{
-    deferredPrompt.prompt();
-    deferredPrompt.userChoice.then(()=> {
-      deferredPrompt = null;
-    });
-  }, 1500);
+    if(deferredPrompt){
+      deferredPrompt.prompt();
+    }
+  },1500);
 });
 
-/* service worker */
 if ("serviceWorker" in navigator) {
   navigator.serviceWorker.register("sw.js");
 }
