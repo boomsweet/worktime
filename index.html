@@ -132,6 +132,7 @@ th, td {
         <th>ออก</th>
         <th>ชม.</th>
         <th>OT</th>
+        <th>OT เวลา</th> <!-- 🔥 เพิ่ม -->
         <th>เหตุผล</th>
         <th>⚙️</th>
       </tr>
@@ -150,7 +151,22 @@ function calc(inTime, outTime){
   let end = new Date("2000-01-01 " + outTime);
   let hrs = (end - start)/1000/60/60;
   let ot = hrs > 9 ? hrs - 9 : 0;
-  return {hrs: hrs.toFixed(2), ot: ot.toFixed(2)};
+
+  let otStart = "-";
+  let otEnd = "-";
+
+  if(ot > 0){
+    let otStartTime = new Date(start.getTime() + (9 * 60 * 60 * 1000));
+    otStart = otStartTime.toTimeString().slice(0,5);
+    otEnd = outTime;
+  }
+
+  return {
+    hrs: hrs.toFixed(2),
+    ot: ot.toFixed(2),
+    otStart,
+    otEnd
+  };
 }
 
 function render(){
@@ -179,6 +195,7 @@ function render(){
       <td>${d.out}</td>
       <td><span class="badge normal">${c.hrs}</span></td>
       <td><span class="badge ${c.ot>0?'ot':'normal'}">${c.ot}</span></td>
+      <td>${c.ot > 0 ? c.otStart + " - " + c.otEnd : "-"}</td>
       <td>${d.note || "-"}</td>
       <td>
         <button class="action-btn edit" onclick="edit(${i})">✏️</button>
@@ -228,10 +245,11 @@ function edit(i){
 }
 
 function exportExcel(){
-  let csv = "Date,In,Out,Hours,OT,Note\n";
+  let csv = "Date,In,Out,Hours,OT,OT Time,Note\n";
   list.forEach(d=>{
     let c = calc(d.in, d.out);
-    csv += `${d.date},${d.in},${d.out},${c.hrs},${c.ot},${d.note}\n`;
+    let otTime = c.ot > 0 ? c.otStart + "-" + c.otEnd : "-";
+    csv += `${d.date},${d.in},${d.out},${c.hrs},${c.ot},${otTime},${d.note}\n`;
   });
 
   let blob = new Blob([csv]);
