@@ -132,7 +132,7 @@ th, td {
         <th>ออก</th>
         <th>ชม.</th>
         <th>OT</th>
-        <th>OT เวลา</th> <!-- 🔥 เพิ่ม -->
+        <th>OT เวลา</th>
         <th>เหตุผล</th>
         <th>⚙️</th>
       </tr>
@@ -178,9 +178,17 @@ function render(){
 
   let sorted = [...list].sort((a,b)=> new Date(b.date) - new Date(a.date));
 
-  sorted.forEach((d,i)=>{
+  sorted.forEach((d)=>{
     let c = calc(d.in, d.out);
     totalOT += parseFloat(c.ot);
+
+    // ✅ แก้บัคตรงนี้
+    let index = list.findIndex(item =>
+      item.date === d.date &&
+      item.in === d.in &&
+      item.out === d.out &&
+      item.note === d.note
+    );
 
     let dateTH = new Date(d.date).toLocaleDateString("th-TH", {
       year: "numeric",
@@ -198,8 +206,8 @@ function render(){
       <td>${c.ot > 0 ? c.otStart + " - " + c.otEnd : "-"}</td>
       <td>${d.note || "-"}</td>
       <td>
-        <button class="action-btn edit" onclick="edit(${i})">✏️</button>
-        <button class="action-btn delete" onclick="del(${i})">🗑️</button>
+        <button class="action-btn edit" onclick="edit(${index})">✏️</button>
+        <button class="action-btn delete" onclick="del(${index})">🗑️</button>
       </td>
     </tr>`;
   });
