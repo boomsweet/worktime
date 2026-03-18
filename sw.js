@@ -1,11 +1,5 @@
 self.addEventListener("install", e=>{
-  e.waitUntil(
-    caches.open("app").then(cache=>{
-      return cache.addAll([
-        "./",
-        "./index.html",
-        "./icon.png"
-      ]);
-    })
-  );
+ self.skipWaiting();
 });
+
+self.addEventListener("fetch", e=>{});
