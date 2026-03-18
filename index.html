@@ -3,129 +3,140 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Bird WorkTime PRO</title>
 
-<link rel="manifest" href="manifest.json">
-<link rel="apple-touch-icon" href="icon2.png">
-<meta name="theme-color" content="#0f172a">
+<title>WorkTime</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Prompt&display=swap" rel="stylesheet">
 
 <style>
-* { box-sizing: border-box; }
-
 body {
-  margin: 0;
-  font-family: 'Segoe UI', sans-serif;
-  background: #020617;
-  color: #e2e8f0;
+  margin:0;
+  font-family:'Prompt',sans-serif;
+  background:linear-gradient(180deg,#020617,#0f172a);
+  color:white;
 }
 
 /* HEADER */
 .header {
-  text-align: center;
-  padding: 20px 10px;
+  text-align:center;
+  padding:20px;
 }
-
 .header img {
-  width: 80px;
-  border-radius: 20px;
-  box-shadow: 0 0 25px #38bdf8;
+  width:70px;
+  border-radius:20px;
+}
+.sub {
+  font-size:12px;
+  color:#94a3b8;
 }
 
-.header h1 {
-  margin-top: 10px;
-  font-size: 20px;
-  color: #38bdf8;
+/* DASHBOARD */
+.stats {
+  display:flex;
+  justify-content:space-around;
+  margin:10px;
+}
+.box {
+  flex:1;
+  margin:5px;
+  padding:12px;
+  text-align:center;
+  border-radius:15px;
+  background:rgba(30,41,59,0.5);
+  backdrop-filter:blur(10px);
 }
 
 /* CARD */
 .card {
-  background: rgba(30,41,59,0.6);
-  backdrop-filter: blur(10px);
-  margin: 12px;
-  padding: 15px;
-  border-radius: 18px;
-  box-shadow: 0 8px 30px rgba(0,0,0,0.5);
+  margin:10px;
+  padding:15px;
+  border-radius:18px;
+  background:rgba(30,41,59,0.5);
+  backdrop-filter:blur(15px);
 }
 
 /* INPUT */
-label {
-  font-size: 13px;
-  color: #94a3b8;
-}
-
 input {
-  width: 100%;
-  padding: 12px;
-  margin: 6px 0 12px;
-  border-radius: 12px;
-  border: none;
-  background: #0f172a;
-  color: white;
+  width:100%;
+  padding:12px;
+  margin:6px 0;
+  border-radius:12px;
+  border:1px solid #1e293b;
+  background:#020617;
+  color:white;
+}
+input:focus {
+  outline:none;
+  border:1px solid #38bdf8;
+  box-shadow:0 0 10px #38bdf8;
 }
 
 /* BUTTON */
-.btn {
-  width: 100%;
-  padding: 12px;
-  border-radius: 14px;
-  border: none;
-  font-weight: bold;
-  margin-top: 6px;
+button {
+  width:100%;
+  padding:12px;
+  border:none;
+  border-radius:12px;
+  margin-top:8px;
+  font-weight:bold;
+}
+button:active {
+  transform:scale(0.96);
 }
 
-.primary {
-  background: linear-gradient(90deg,#38bdf8,#0ea5e9);
-  color: white;
-}
-
-.success {
-  background: linear-gradient(90deg,#22c55e,#16a34a);
-  color: white;
-}
-
-/* TOTAL */
-.total {
-  text-align: center;
-  font-size: 18px;
-  margin-bottom: 10px;
-}
+.primary { background:#38bdf8; }
+.success { background:#22c55e; }
 
 /* TABLE */
 table {
-  width: 100%;
-  border-collapse: collapse;
+  width:100%;
+  font-size:13px;
 }
-
-th {
-  background: #1e293b;
-}
-
-th, td {
-  padding: 8px;
-  font-size: 13px;
-  text-align: center;
+th,td {
+  padding:6px;
+  text-align:center;
 }
 
 /* BADGE */
 .badge {
-  padding: 4px 8px;
-  border-radius: 8px;
-  font-size: 12px;
+  padding:4px 8px;
+  border-radius:999px;
+}
+.ot {
+  background:rgba(239,68,68,0.2);
+  color:#ef4444;
+}
+.normal {
+  background:rgba(34,197,94,0.2);
+  color:#22c55e;
 }
 
-.ot { background: #ef4444; }
-.normal { background: #22c55e; }
-
-/* ACTION */
-.action-btn {
-  padding: 5px 8px;
-  border-radius: 8px;
-  border: none;
-  margin: 2px;
+/* MONTH HEADER */
+.month {
+  text-align:left;
+  padding:10px;
+  font-weight:bold;
+  color:#38bdf8;
 }
-.edit { background: #facc15; }
-.delete { background: #ef4444; }
 
+/* EMPTY */
+.empty {
+  text-align:center;
+  color:#94a3b8;
+  margin-top:10px;
+}
+
+/* NAV */
+.nav {
+  position:fixed;
+  bottom:0;
+  width:100%;
+  background:#020617;
+  display:flex;
+  justify-content:space-around;
+  padding:10px 0;
+  border-top:1px solid #1e293b;
+}
 </style>
 </head>
 
@@ -133,133 +144,139 @@ th, td {
 
 <div class="header">
   <img src="icon.png">
-  <h1>Bird WorkTime PRO</h1>
+  <h2>WorkTime</h2>
+  <div class="sub">ระบบบันทึกเวลา & OT</div>
 </div>
 
-<div class="card">
-  <label>📅 วันที่</label>
-  <input type="date" id="date">
-
-  <label>⏰ เข้า</label>
-  <input type="time" id="in">
-
-  <label>⏰ ออก</label>
-  <input type="time" id="out">
-
-  <label>📝 เหตุผล OT</label>
-  <input type="text" id="note">
-
-  <button class="btn primary" onclick="save()">💾 บันทึก</button>
-  <button class="btn success" onclick="exportExcel()">📥 Export</button>
+<!-- DASHBOARD -->
+<div class="stats">
+  <div class="box">🕒<br><span id="hrs">0</span></div>
+  <div class="box">🔥<br><span id="ot">0</span></div>
+  <div class="box">📅<br><span id="days">0</span></div>
 </div>
 
+<!-- INPUT -->
 <div class="card">
-  <div class="total">📊 OT รวม: <span id="totalOT">0</span> ชม.</div>
+<input type="date" id="date">
+<input type="time" id="in">
+<input type="time" id="out">
+<input type="text" id="note" placeholder="เหตุผล OT">
 
-  <table>
-    <thead>
-      <tr>
-        <th>วัน</th>
-        <th>เข้า</th>
-        <th>ออก</th>
-        <th>ชม.</th>
-        <th>OT</th>
-        <th>เหตุผล</th>
-        <th>⚙️</th>
-      </tr>
-    </thead>
-    <tbody id="data"></tbody>
-  </table>
+<button class="primary" onclick="save()">บันทึก</button>
+<button class="success" onclick="exportExcel()">Export</button>
+</div>
+
+<!-- TABLE -->
+<div class="card">
+<table>
+<thead>
+<tr>
+<th>วัน</th><th>OT</th><th>เหตุผล</th>
+</tr>
+</thead>
+<tbody id="data"></tbody>
+</table>
+
+<p id="empty" class="empty"></p>
+</div>
+
+<div class="nav">
+🏠 📊 ⚙️
 </div>
 
 <script>
 let list = JSON.parse(localStorage.getItem("work")) || [];
 
-function calc(inTime, outTime){
-  let start = new Date("2000-01-01 " + inTime);
-  let end = new Date("2000-01-01 " + outTime);
-  let hrs = (end - start)/1000/60/60;
-  let ot = hrs > 9 ? hrs - 9 : 0;
-  return {hrs: hrs.toFixed(2), ot: ot.toFixed(2)};
+function calc(i,o){
+ let s=new Date("2000 "+i);
+ let e=new Date("2000 "+o);
+ let h=(e-s)/3600000;
+ return {hrs:h, ot:h>9?(h-9):0};
 }
 
 function render(){
-  let html = "";
-  let totalOT = 0;
+ let html = "";
+ let totalOT = 0, totalH = 0;
 
-  list.forEach((d,i)=>{
-    let c = calc(d.in, d.out);
-    totalOT += parseFloat(c.ot);
+ if(list.length===0){
+  document.getElementById("empty").innerText="ยังไม่มีข้อมูล 😅";
+ } else {
+  document.getElementById("empty").innerText="";
+ }
 
-    html += `
-    <tr>
-      <td>${d.date}</td>
-      <td>${d.in}</td>
-      <td>${d.out}</td>
-      <td><span class="badge normal">${c.hrs}</span></td>
-      <td><span class="badge ${c.ot>0?'ot':'normal'}">${c.ot}</span></td>
-      <td>${d.note || "-"}</td>
-      <td>
-        <button class="action-btn edit" onclick="edit(${i})">✏️</button>
-        <button class="action-btn delete" onclick="del(${i})">🗑️</button>
-      </td>
-    </tr>`;
+ let sorted = [...list].sort((a,b)=> new Date(b.date) - new Date(a.date));
+
+ let currentMonth = "";
+
+ sorted.forEach(d=>{
+  let dateObj = new Date(d.date);
+
+  let monthName = dateObj.toLocaleDateString("th-TH", {
+    year: "numeric",
+    month: "long"
   });
 
-  document.getElementById("data").innerHTML = html;
-  document.getElementById("totalOT").innerText = totalOT.toFixed(2);
-  localStorage.setItem("work", JSON.stringify(list));
+  if(monthName !== currentMonth){
+    currentMonth = monthName;
+    html += `
+    <tr>
+      <td colspan="3" class="month">📅 ${monthName}</td>
+    </tr>`;
+  }
+
+  let c = calc(d.in,d.out);
+  totalOT += c.ot;
+  totalH += c.hrs;
+
+  html += `
+  <tr>
+    <td>${d.date}</td>
+    <td><span class="badge ${c.ot>0?'ot':'normal'}">${c.ot.toFixed(2)}</span></td>
+    <td>${d.note || "-"}</td>
+  </tr>`;
+ });
+
+ document.getElementById("data").innerHTML = html;
+ document.getElementById("ot").innerText = totalOT.toFixed(2);
+ document.getElementById("hrs").innerText = totalH.toFixed(2);
+ document.getElementById("days").innerText = list.length;
+
+ localStorage.setItem("work", JSON.stringify(list));
 }
 
 function save(){
-  let date = document.getElementById("date").value;
-  let inputIn = document.getElementById("in").value;
-  let out = document.getElementById("out").value;
-  let note = document.getElementById("note").value;
+ let d=date.value;
+ let i=in.value;
+ let o=out.value;
+ let n=note.value;
 
-  if(!date || !inputIn || !out){
-    alert("กรอกข้อมูลให้ครบ");
-    return;
-  }
+ if(!d||!i||!o){ alert("กรอกให้ครบ"); return; }
 
-  list.push({date, in:inputIn, out, note});
-  render();
-}
+ list.push({date:d,in:i,out:o,note:n});
 
-function del(i){
-  list.splice(i,1);
-  render();
-}
+ date.value="";
+ in.value="";
+ out.value="";
+ note.value="";
 
-function edit(i){
-  let d = list[i];
-  document.getElementById("date").value = d.date;
-  document.getElementById("in").value = d.in;
-  document.getElementById("out").value = d.out;
-  document.getElementById("note").value = d.note;
-  del(i);
+ render();
 }
 
 function exportExcel(){
-  let csv = "Date,In,Out,Hours,OT,Note\n";
+ let csv="Date,OT,Note\n";
+ list.forEach(d=>{
+  let c=calc(d.in,d.out);
+  csv+=`${d.date},${c.ot.toFixed(2)},${d.note}\n`;
+ });
 
-  list.forEach(d=>{
-    let c = calc(d.in, d.out);
-    csv += `${d.date},${d.in},${d.out},${c.hrs},${c.ot},${d.note}\n`;
-  });
-
-  let blob = new Blob([csv], {type: "text/csv"});
-  let a = document.createElement("a");
-  a.href = URL.createObjectURL(blob);
-  a.download = "worktime.csv";
-  a.click();
+ let blob=new Blob([csv]);
+ let a=document.createElement("a");
+ a.href=URL.createObjectURL(blob);
+ a.download="worktime.csv";
+ a.click();
 }
 
 render();
-
-if ("serviceWorker" in navigator) {
-  navigator.serviceWorker.register("sw.js");
-}
 </script>
 
 </body>
