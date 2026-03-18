@@ -7,138 +7,169 @@
 
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="icon.png">
-<meta name="theme-color" content="#38bdf8">
+<meta name="theme-color" content="#0f172a">
 
 <style>
+* { box-sizing: border-box; }
+
 body {
-  font-family: sans-serif;
-  background: linear-gradient(180deg,#0f172a,#020617);
-  color: white;
-  padding: 15px;
+  margin: 0;
+  font-family: 'Segoe UI', sans-serif;
+  background: #020617;
+  color: #e2e8f0;
 }
 
-.container {
-  max-width: 500px;
-  margin: auto;
-}
-
-.logo {
+/* HEADER */
+.header {
   text-align: center;
-  margin-bottom: 10px;
+  padding: 20px 10px;
 }
 
-.logo img {
-  width: 110px;
+.header img {
+  width: 80px;
   border-radius: 20px;
-  box-shadow: 0 0 20px #38bdf8;
+  box-shadow: 0 0 25px #38bdf8;
 }
 
-h1 {
-  text-align: center;
+.header h1 {
+  margin-top: 10px;
+  font-size: 20px;
   color: #38bdf8;
-  margin-bottom: 15px;
 }
 
+/* CARD */
 .card {
-  background: #1e293b;
+  background: rgba(30,41,59,0.6);
+  backdrop-filter: blur(10px);
+  margin: 12px;
   padding: 15px;
-  border-radius: 15px;
-  margin-bottom: 15px;
+  border-radius: 18px;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.5);
 }
 
+/* INPUT */
 label {
+  font-size: 13px;
   color: #94a3b8;
-  font-size: 14px;
 }
 
 input {
   width: 100%;
   padding: 12px;
   margin: 6px 0 12px;
-  border-radius: 10px;
-  border: none;
-}
-
-button {
-  width: 100%;
-  padding: 12px;
   border-radius: 12px;
   border: none;
-  font-weight: bold;
-  margin-top: 5px;
+  background: #0f172a;
+  color: white;
 }
 
-.save { background: #38bdf8; }
-.export { background: #22c55e; }
+/* BUTTON */
+.btn {
+  width: 100%;
+  padding: 12px;
+  border-radius: 14px;
+  border: none;
+  font-weight: bold;
+  margin-top: 6px;
+}
 
+.primary {
+  background: linear-gradient(90deg,#38bdf8,#0ea5e9);
+  color: white;
+}
+
+.success {
+  background: linear-gradient(90deg,#22c55e,#16a34a);
+  color: white;
+}
+
+/* TOTAL */
+.total {
+  text-align: center;
+  font-size: 18px;
+  margin-bottom: 10px;
+}
+
+/* TABLE */
 table {
   width: 100%;
   border-collapse: collapse;
 }
 
 th {
-  background: #334155;
+  background: #1e293b;
 }
 
 th, td {
   padding: 8px;
+  font-size: 13px;
   text-align: center;
 }
 
-.total {
-  text-align: center;
-  margin-bottom: 10px;
+/* BADGE */
+.badge {
+  padding: 4px 8px;
+  border-radius: 8px;
+  font-size: 12px;
 }
+
+.ot { background: #ef4444; }
+.normal { background: #22c55e; }
+
+/* ACTION */
+.action-btn {
+  padding: 5px 8px;
+  border-radius: 8px;
+  border: none;
+  margin: 2px;
+}
+.edit { background: #facc15; }
+.delete { background: #ef4444; }
+
 </style>
 </head>
 
 <body>
 
-<div class="container">
-
-<!-- 🔥 โลโก้ -->
-<div class="logo">
+<div class="header">
   <img src="icon.png">
+  <h1>Bird WorkTime PRO</h1>
 </div>
-
-<h1>Bird WorkTime PRO</h1>
 
 <div class="card">
   <label>📅 วันที่</label>
   <input type="date" id="date">
 
-  <label>⏰ เวลาเข้างาน</label>
+  <label>⏰ เข้า</label>
   <input type="time" id="in">
 
-  <label>⏰ เวลาออกงาน</label>
+  <label>⏰ ออก</label>
   <input type="time" id="out">
 
   <label>📝 เหตุผล OT</label>
-  <input type="text" id="note" placeholder="เช่น งานด่วน / ลูกค้า / แก้ระบบ">
+  <input type="text" id="note">
 
-  <button class="save" onclick="save()">💾 บันทึก</button>
-  <button class="export" onclick="exportExcel()">📥 Export Excel</button>
+  <button class="btn primary" onclick="save()">💾 บันทึก</button>
+  <button class="btn success" onclick="exportExcel()">📥 Export</button>
 </div>
 
 <div class="card">
-  <div class="total">📊 รวม OT: <span id="totalOT">0</span> ชั่วโมง</div>
+  <div class="total">📊 OT รวม: <span id="totalOT">0</span> ชม.</div>
 
-  <table border="1">
+  <table>
     <thead>
       <tr>
-        <th>วันที่</th>
+        <th>วัน</th>
         <th>เข้า</th>
         <th>ออก</th>
         <th>ชม.</th>
         <th>OT</th>
         <th>เหตุผล</th>
-        <th>จัดการ</th>
+        <th>⚙️</th>
       </tr>
     </thead>
     <tbody id="data"></tbody>
   </table>
-</div>
-
 </div>
 
 <script>
@@ -165,19 +196,18 @@ function render(){
       <td>${d.date}</td>
       <td>${d.in}</td>
       <td>${d.out}</td>
-      <td>${c.hrs}</td>
-      <td>${c.ot}</td>
+      <td><span class="badge normal">${c.hrs}</span></td>
+      <td><span class="badge ${c.ot>0?'ot':'normal'}">${c.ot}</span></td>
       <td>${d.note || "-"}</td>
       <td>
-        <button onclick="edit(${i})">✏️</button>
-        <button onclick="del(${i})">🗑️</button>
+        <button class="action-btn edit" onclick="edit(${i})">✏️</button>
+        <button class="action-btn delete" onclick="del(${i})">🗑️</button>
       </td>
     </tr>`;
   });
 
   document.getElementById("data").innerHTML = html;
   document.getElementById("totalOT").innerText = totalOT.toFixed(2);
-
   localStorage.setItem("work", JSON.stringify(list));
 }
 
@@ -227,7 +257,6 @@ function exportExcel(){
 
 render();
 
-// 🔥 Service Worker
 if ("serviceWorker" in navigator) {
   navigator.serviceWorker.register("sw.js");
 }
