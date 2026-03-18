@@ -10,40 +10,65 @@
 
 <style>
 * { box-sizing: border-box; }
+
+/* 🌈 พื้นหลังใหม่ */
 body {
   margin: 0;
   font-family: 'Segoe UI', sans-serif;
-  background: #020617;
+  background: radial-gradient(circle at top, #0f172a, #020617);
   color: #e2e8f0;
+  animation: fadeIn 0.5s ease;
 }
+
+/* HEADER */
 .header { text-align: center; padding: 20px 10px; }
 .header img {
   width: 80px;
   border-radius: 20px;
-  box-shadow: 0 0 25px #38bdf8;
+  box-shadow: 0 0 30px #38bdf8;
 }
-.header h1 { margin-top: 10px; font-size: 20px; color: #38bdf8; }
+.header h1 {
+  margin-top: 10px;
+  font-size: 22px;
+  background: linear-gradient(45deg, #38bdf8, #22c55e);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
 
+/* 💎 CARD */
 .card {
-  background: rgba(30,41,59,0.6);
-  backdrop-filter: blur(10px);
+  background: rgba(30,41,59,0.7);
+  backdrop-filter: blur(12px);
   margin: 12px;
   padding: 15px;
-  border-radius: 18px;
+  border-radius: 20px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+  transition: 0.3s;
+}
+.card:hover {
+  transform: translateY(-3px);
 }
 
+/* INPUT */
 label { font-size: 13px; color: #94a3b8; }
 
 input {
   width: 100%;
   padding: 12px;
   margin: 6px 0 12px;
-  border-radius: 12px;
-  border: none;
-  background: #0f172a;
+  border-radius: 14px;
+  border: 1px solid rgba(255,255,255,0.05);
+  background: rgba(15,23,42,0.8);
   color: white;
+  transition: 0.2s;
+}
+input:focus {
+  outline: none;
+  border-color: #38bdf8;
+  box-shadow: 0 0 10px #38bdf8;
 }
 
+/* BUTTON */
 .btn {
   width: 100%;
   padding: 12px;
@@ -51,19 +76,27 @@ input {
   border: none;
   font-weight: bold;
   margin-top: 6px;
+  transition: 0.2s;
+}
+.btn:active {
+  transform: scale(0.95);
 }
 .primary { background: #38bdf8; }
 .success { background: #22c55e; }
 
+/* TOTAL */
 .total {
   text-align: center;
   font-size: 18px;
   margin-bottom: 10px;
 }
 
+/* TABLE */
 table {
   width: 100%;
   border-collapse: collapse;
+  overflow: hidden;
+  border-radius: 12px;
 }
 th { background: #1e293b; }
 th, td {
@@ -71,15 +104,23 @@ th, td {
   font-size: 13px;
   text-align: center;
 }
+tr:hover {
+  background: rgba(255,255,255,0.05);
+}
 
+/* BADGE */
 .badge {
   padding: 4px 8px;
   border-radius: 8px;
   font-size: 12px;
 }
-.ot { background: #ef4444; }
+.ot {
+  background: linear-gradient(45deg, #ef4444, #dc2626);
+  box-shadow: 0 0 10px rgba(239,68,68,0.7);
+}
 .normal { background: #22c55e; }
 
+/* ACTION */
 .action-btn {
   padding: 5px 8px;
   border-radius: 8px;
@@ -93,6 +134,12 @@ th, td {
   text-align:center;
   margin-top:10px;
   color:#94a3b8;
+}
+
+/* ✨ Animation */
+@keyframes fadeIn {
+  from {opacity: 0;}
+  to {opacity: 1;}
 }
 </style>
 </head>
@@ -132,7 +179,6 @@ th, td {
         <th>ออก</th>
         <th>ชม.</th>
         <th>OT</th>
-        <th>OT เวลา</th> <!-- 🔥 เพิ่ม -->
         <th>เหตุผล</th>
         <th>⚙️</th>
       </tr>
@@ -151,22 +197,7 @@ function calc(inTime, outTime){
   let end = new Date("2000-01-01 " + outTime);
   let hrs = (end - start)/1000/60/60;
   let ot = hrs > 9 ? hrs - 9 : 0;
-
-  let otStart = "-";
-  let otEnd = "-";
-
-  if(ot > 0){
-    let otStartTime = new Date(start.getTime() + (9 * 60 * 60 * 1000));
-    otStart = otStartTime.toTimeString().slice(0,5);
-    otEnd = outTime;
-  }
-
-  return {
-    hrs: hrs.toFixed(2),
-    ot: ot.toFixed(2),
-    otStart,
-    otEnd
-  };
+  return {hrs: hrs.toFixed(2), ot: ot.toFixed(2)};
 }
 
 function render(){
@@ -195,7 +226,6 @@ function render(){
       <td>${d.out}</td>
       <td><span class="badge normal">${c.hrs}</span></td>
       <td><span class="badge ${c.ot>0?'ot':'normal'}">${c.ot}</span></td>
-      <td>${c.ot > 0 ? c.otStart + " - " + c.otEnd : "-"}</td>
       <td>${d.note || "-"}</td>
       <td>
         <button class="action-btn edit" onclick="edit(${i})">✏️</button>
@@ -245,11 +275,10 @@ function edit(i){
 }
 
 function exportExcel(){
-  let csv = "Date,In,Out,Hours,OT,OT Time,Note\n";
+  let csv = "Date,In,Out,Hours,OT,Note\n";
   list.forEach(d=>{
     let c = calc(d.in, d.out);
-    let otTime = c.ot > 0 ? c.otStart + "-" + c.otEnd : "-";
-    csv += `${d.date},${d.in},${d.out},${c.hrs},${c.ot},${otTime},${d.note}\n`;
+    csv += `${d.date},${d.in},${d.out},${c.hrs},${c.ot},${d.note}\n`;
   });
 
   let blob = new Blob([csv]);
