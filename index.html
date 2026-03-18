@@ -5,9 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Bird WorkTime PRO</title>
 
-<!-- 🔥 เพิ่ม PWA -->
 <link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#0f172a">
+<meta name="theme-color" content="#020617">
 
 <style>
 * { box-sizing: border-box; }
@@ -116,20 +115,6 @@ th, td {
   margin-top:10px;
   color:#94a3b8;
 }
-
-/* 🔥 ปุ่มติดตั้ง */
-.install-btn {
-  position: fixed;
-  bottom: 80px;
-  left: 50%;
-  transform: translateX(-50%);
-  padding: 12px 20px;
-  border-radius: 12px;
-  background: #22c55e;
-  color: white;
-  border: none;
-  display: none;
-}
 </style>
 </head>
 
@@ -178,9 +163,6 @@ th, td {
   <p id="empty" class="empty"></p>
 </div>
 
-<!-- 🔥 ปุ่มติดตั้ง -->
-<button id="installBtn" class="install-btn">📲 ติดตั้งแอป</button>
-
 <script>
 let list = JSON.parse(localStorage.getItem("work")) || [];
 
@@ -202,13 +184,20 @@ function render(){
     document.getElementById("empty").innerText = "";
   }
 
-  let sorted = [...list].sort((a,b)=> new Date(b.date) - new Date(a.date));
+  let sorted = [...list].sort((a,b)=>{
+    return new Date(b.date) - new Date(a.date);
+  });
 
   sorted.forEach((d,i)=>{
     let c = calc(d.in, d.out);
     totalOT += parseFloat(c.ot);
 
-    let dateTH = new Date(d.date).toLocaleDateString("th-TH");
+    // ✅ พ.ศ. แบบเดิมเป๊ะ
+    let dateTH = new Date(d.date).toLocaleDateString("th-TH", {
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit"
+    });
 
     html += `
     <tr>
@@ -236,12 +225,7 @@ function save(){
     return;
   }
 
-  list.push({
-    date:date.value,
-    in:in.value,
-    out:out.value,
-    note:note.value
-  });
+  list.push({date:date.value, in:in.value, out:out.value, note:note.value});
 
   date.value="";
   in.value="";
@@ -251,10 +235,7 @@ function save(){
   render();
 }
 
-function del(i){
-  list.splice(i,1);
-  render();
-}
+function del(i){ list.splice(i,1); render(); }
 
 function edit(i){
   let d = list[i];
@@ -281,25 +262,23 @@ function exportExcel(){
 
 render();
 
-/* 🔥 ระบบติดตั้งแอป */
+/* 🔥 ติดตั้งแอปอัตโนมัติ */
 let deferredPrompt;
-const btn = document.getElementById("installBtn");
 
-window.addEventListener("beforeinstallprompt",(e)=>{
+window.addEventListener("beforeinstallprompt", (e) => {
   e.preventDefault();
   deferredPrompt = e;
-  btn.style.display = "block";
+
+  // 👉 เด้ง popup ทันที
+  setTimeout(()=>{
+    deferredPrompt.prompt();
+    deferredPrompt.userChoice.then(()=> {
+      deferredPrompt = null;
+    });
+  }, 1500);
 });
 
-btn.onclick = () => {
-  deferredPrompt.prompt();
-  deferredPrompt.userChoice.then(()=>{
-    deferredPrompt = null;
-    btn.style.display = "none";
-  });
-};
-
-/* 🔥 service worker */
+/* service worker */
 if ("serviceWorker" in navigator) {
   navigator.serviceWorker.register("sw.js");
 }
